@@ -28,28 +28,32 @@ const defaultOptions: RedditOptions = {
 
 export default class Requests {
   private options: RedditOptions;
-  private token?: string;
   private oauth;
   private reddit;
 
   constructor(options: RedditOptions) {
     // Makes sure that connection.{reddit, oauth} aren't undefined
     this.options = { ...defaultOptions, ...options };
-    this.oauth = ky.create({
-      prefixUrl: this.options.connection?.oauth,
-    });
+
+    // creating ky instances for better readability
     this.reddit = ky.create({
       prefixUrl: this.options.connection?.reddit,
+      headers: {
+        "User-Agent": this.options.userAgent,
+      },
     });
 
-    console.log(this.options);
+    this.oauth = ky.create({
+      prefixUrl: this.options.connection?.oauth,
+      headers: {
+        "User-Agent": this.options.userAgent,
+      },
+    });
+
+    this.login();
   }
 
-  async login() {
-    this.token = await this.initializeConnection();
-  }
-
-  private async initializeConnection(): Promise<string> {
+  private async login(): Promise<void> {
     // /api/v1/access_token takes application/x-www-form-urlencoded, not json
 
     interface ResponseParams {
@@ -60,6 +64,7 @@ export default class Requests {
       error: string;
     }
 
+    // we need to await fetch the token...
     const response = await this.reddit.post(
       "api/v1/access_token",
       {
@@ -72,10 +77,9 @@ export default class Requests {
           Authorization: `Basic ${
             btoa(`${this.options.clientID}:${this.options.clientSecret}`)
           }`,
-          "User-Agent": this.options.userAgent,
         },
       },
-    ).json<ResponseParams>().catch((reason) => {
+    ).json<ResponseParams>().catch((reason: string) => {
       throw new RedditAPIError(reason);
     });
 
@@ -83,6 +87,20 @@ export default class Requests {
       throw new RedditAPIError(response.error);
     }
 
-    return response.access_token;
+    // ...and then extend the `oauth` ky instance with that token
+    this.oauth = this.oauth.extend({
+      prefixUrl: this.options.connection?.oauth,
+      headers: {
+        Authorization: btoa(`bearer ${this.options.clientID}:`),
+      },
+    });
+  }
+
+  async get(path: string) {
+    return await this.oauth.get(path);
+  }
+
+  async post(path: string) {
+    const response = await this.oauth.post(path).json();
   }
 }
