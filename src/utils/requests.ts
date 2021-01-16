@@ -97,10 +97,13 @@ export default class Requests {
   }
 
   async get(path: string) {
-    return await this.oauth.get(path);
+    return await this.oauth.get(path).json();
   }
 
-  async post(path: string) {
-    const response = await this.oauth.post(path).json();
+  // deno-lint-ignore ban-types
+  async post(path: string, body: object) {
+    return await this.oauth.post(path, {
+      json: { api_type: "json", ...body },
+    });
   }
 }
