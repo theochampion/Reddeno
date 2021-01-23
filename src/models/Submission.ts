@@ -1,6 +1,5 @@
 import Requests from "../utils/requests.ts";
 import PrimaryContent from "./internal/PrimaryContent.ts";
-import Replyable from "./internal/Replyable.ts";
 
 export default class Submission extends PrimaryContent {
   id: string;
@@ -12,7 +11,6 @@ export default class Submission extends PrimaryContent {
   }
 
   hide() {
-    console.log(this.fullname);
     this.req.postParams("api/hide", { id: this.fullname });
   }
 }

@@ -93,8 +93,6 @@ export default class Requests {
       throw new RedditAPIError(response.error);
     }
 
-    console.log(response.access_token);
-
     // ...and then extend the `oauth` ky instance with that token
     this.oauth = this.oauth.extend({
       prefixUrl: this.options.connection?.oauth,
