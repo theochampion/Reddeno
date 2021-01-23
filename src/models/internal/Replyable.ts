@@ -8,16 +8,17 @@ type Replyables =
 
 export default abstract class Replyable extends Content {
   reply(content: string, type: Replyables) {
-    this.req.postJson("api/comment", {
+    this.req.postParams("api/comment", {
       text: content,
       thing_id: type,
     });
   }
 
   edit(content: string) {
-    this.req.postJson("api/editusertext", {
+    this.req.postParams("api/editusertext", {
       text: content,
       thing_id: this.fullname,
+      return_rtjson: false,
     });
   }
 
