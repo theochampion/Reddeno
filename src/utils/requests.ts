@@ -30,6 +30,7 @@ export default class Requests {
   private options: RedditOptions;
   private oauth;
   private reddit;
+  private authenticated: boolean;
 
   constructor(options: RedditOptions) {
     // Makes sure that connection.{reddit, oauth} aren't undefined
@@ -50,7 +51,7 @@ export default class Requests {
       },
     });
 
-    this.login();
+    this.authenticated = false; // we need to perform the login on first request
   }
 
   private async login(): Promise<void> {
@@ -62,6 +63,11 @@ export default class Requests {
       expires_in: number;
       scope: string;
       error: string;
+    }
+
+    // first off, let's check whether we're not authenticated *already*
+    if (this.authenticated) {
+      return;
     }
 
     // we need to await fetch the token...
@@ -87,21 +93,41 @@ export default class Requests {
       throw new RedditAPIError(response.error);
     }
 
+    console.log(response.access_token);
+
     // ...and then extend the `oauth` ky instance with that token
     this.oauth = this.oauth.extend({
       prefixUrl: this.options.connection?.oauth,
       headers: {
-        Authorization: btoa(`bearer ${this.options.clientID}:`),
+        Authorization: `bearer ${response.access_token}`,
       },
     });
+
+    this.authenticated = true;
   }
 
   async get(path: string) {
+    // we need to perform authentication on first request
+    await this.login();
+
     return await this.oauth.get(path).json();
   }
 
   // deno-lint-ignore ban-types
-  async post(path: string, body: object) {
+  async postParams(path: string, body: object) {
+    // we need to perform authentication on first request
+    await this.login();
+
+    return await this.oauth.post(path, {
+      searchParams: { ...body },
+    });
+  }
+
+  // deno-lint-ignore ban-types
+  async postJson(path: string, body: object) {
+    // we need to perform authentication on first request
+    await this.login();
+
     return await this.oauth.post(path, {
       json: { api_type: "json", ...body },
     });
