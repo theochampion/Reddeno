@@ -104,11 +104,12 @@ export default class Requests {
     this.authenticated = true;
   }
 
-  async get(path: string) {
+  // deno-lint-ignore ban-types
+  async get(path: string, body: object) {
     // we need to perform authentication on first request
     await this.login();
 
-    return await this.oauth.get(path).json();
+    return await this.reddit.get(path, { searchParams: { ...body } }).json();
   }
 
   // deno-lint-ignore ban-types

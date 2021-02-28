@@ -7,10 +7,10 @@ type Replyables =
   | FullnamePrefixes.Submission;
 
 export default abstract class Replyable extends Content {
-  reply(content: string, type: Replyables) {
+  reply(content: string) {
     this.req.postParams("api/comment", {
       text: content,
-      thing_id: type,
+      thing_id: this.fullname,
     });
   }
 
@@ -18,7 +18,6 @@ export default abstract class Replyable extends Content {
     this.req.postParams("api/editusertext", {
       text: content,
       thing_id: this.fullname,
-      return_rtjson: false,
     });
   }
 

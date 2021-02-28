@@ -5,8 +5,18 @@ import Replyable from "./Replyable.ts";
  */
 export default abstract class PrimaryContent extends Replyable {
   save() {
-    return this.req.postParams("api/save", {
-      id: this.fullname,
-    });
+    this.req.postParams("api/save", { id: this.fullname });
+  }
+
+  unsave() {
+    this.req.postParams("api/unsave", { id: this.fullname });
+  }
+
+  lock() {
+    this.req.postParams("api/lock", { id: this.fullname });
+  }
+
+  unlock() {
+    this.req.postParams("api/unlock", { id: this.fullname });
   }
 }
