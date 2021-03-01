@@ -9,7 +9,11 @@ export default class Reddit {
     this.req = new Requests(options);
   }
 
-  async submission(id: string) {
+  /**
+   * @description Returns a Submission object with the desired ID.
+   * @param id Reddit ID of the desired submission.
+   */
+  async submission(id: string): Promise<Submission> {
     const fullname = `${FullnamePrefixes.Submission}${id}`;
     // deno-lint-ignore no-explicit-any
     const d: any = await this.req.get(
@@ -29,5 +33,12 @@ export default class Reddit {
       },
       this.req,
     );
+  }
+
+  /**
+   * @description Provides a `Redditor` object for the specified username.
+   * @param username Username of the Redditor.
+   */
+  async redditor(username: string) {
   }
 }
