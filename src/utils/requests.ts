@@ -1,3 +1,4 @@
+// deno-lint-ignore-file camelcase
 // @deno-types="../libs/ky-types.d.ts"
 import ky from "https://deno.land/x/ky@v0.23.0/index.js";
 import { RedditAPIError } from "./errors.ts";
