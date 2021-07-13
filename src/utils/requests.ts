@@ -1,6 +1,6 @@
 // deno-lint-ignore-file camelcase
 // @deno-types="../libs/ky-types.d.ts"
-import ky from "https://deno.land/x/ky@v0.23.0/index.js";
+import ky, { ResponsePromise } from "https://deno.land/x/ky@v0.23.0/index.js";
 import { RedditAPIError } from "./errors.ts";
 
 export interface RedditOptions {
@@ -22,7 +22,7 @@ const defaultOptions: RedditOptions = {
   password: "",
   userAgent: "",
   connection: {
-    reddit: "https://reddit.com",
+    reddit: "https://www.reddit.com",
     oauth: "https://oauth.reddit.com",
   },
 };
@@ -106,7 +106,7 @@ export default class Requests {
   }
 
   // deno-lint-ignore ban-types
-  async get(path: string, body: object) {
+  async get(path: string, body: object): Promise<ResponsePromise> {
     // we need to perform authentication on first request
     await this.login();
 
