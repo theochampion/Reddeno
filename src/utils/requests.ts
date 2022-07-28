@@ -93,6 +93,7 @@ export default class Requests {
     if (response.error) {
       throw new RedditAPIError(response.error);
     }
+    console.log("got token", response)
 
     // ...and then extend the `oauth` ky instance with that token
     this.oauth = this.oauth.extend({
